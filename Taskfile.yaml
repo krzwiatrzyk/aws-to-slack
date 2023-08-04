@@ -8,3 +8,25 @@ tasks:
   test: npm test
 
   lint: npm lint
+
+  package: 
+    env:
+      TEMP_PATH: .temp
+      RELEASE_ZIP: release.zip
+    cmds:
+    - |
+      rm -r "$TEMP_PATH" 2>/dev/null || true
+      rm "$RELEASE_ZIP" 2>/dev/null || true
+      mkdir -p "$TEMP_PATH"
+    - |
+      # Copy sources to temporary folder
+      cp -R src package-lock.json package.json "$TEMP_PATH/"
+    - |
+      # Install dependencies
+      cd "$TEMP_PATH" && npm install --production
+    - |
+      # Package artifact
+      cd "$TEMP_PATH" && zip -rq "../$RELEASE_ZIP" .
+    - |
+      # Cleanup
+      rm -r "$TEMP_PATH"
